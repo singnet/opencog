@@ -188,7 +188,7 @@ private:
 	 * obtained specialization.
 	 */
 	HandleTree specialize_shapat(const Handle& pattern,
-	                             const HandleSet texts,
+	                             const HandleSet& texts,
 	                             const Handle& var,
 	                             const Handle& shapat,
 	                             int maxdepth);
