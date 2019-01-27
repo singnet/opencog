@@ -302,7 +302,8 @@
                    (maximum-iterations 1000)
                    (complexity-penalty 1)
                    (incremental-expansion (stv 0 1))
-                   (max-conjuncts 3))
+                   (max-conjuncts 3)
+                   (surprisingness "I-Surprisingness"))
 "
   Mine patterns in texts (text trees, a.k.a. grounded hypergraphs) with minimum
   support ms, optionally using mi iterations and starting from the initial
@@ -314,7 +315,8 @@
                    #:maximum-iterations mi
                    #:complexity-penalty cp
                    #:incremental-expansion tv
-                   #:max-conjuncts mc)
+                   #:max-conjuncts mc
+                   #:surprisingness su)
 
   texts: Collection of texts to mine. It can be given in 3 forms
 
@@ -369,6 +371,10 @@
       the number of conjuncts can grow unlimited (not recommended unless you
       know what you're doing). As of now mc can not be set above 9 (which
       should be more than enough).
+
+  su: [optional, default=\"I-Surprisingness\"] After running the pattern miner,
+      patterns can be ranked according to some surprisingness measure. Currently,
+      only \"I-Surprisingness\" is implemented.
 
   Under the hood it will create a rule base and a query for the rule
   engine, configure it according to the user's options and run it.
