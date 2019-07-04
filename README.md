@@ -1,7 +1,7 @@
 OpenCog
 =======
 
-[![CircleCI](https://circleci.com/gh/opencog/opencog.svg?style=svg)](https://circleci.com/gh/opencog/opencog)
+[![CircleCI](https://circleci.com/gh/singnet/opencog.svg?style=svg)](https://circleci.com/gh/singnet/opencog)
 
 OpenCog is a framework for developing AI systems, especially appropriate
 for integrative multi-algorithm systems, and artificial general intelligence
