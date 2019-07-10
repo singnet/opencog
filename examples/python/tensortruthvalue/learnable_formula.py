@@ -2,6 +2,7 @@
 learnable pln formula experiments
 """
 
+import sys
 import unittest
 import torch
 import torch.optim as optim
@@ -10,16 +11,18 @@ from opencog.ure import BackwardChainer
 from opencog.atomspace import AtomSpace, types
 from opencog.utilities import initialize_opencog, finalize_opencog
 from opencog.type_constructors import *
-from pln import  TTruthValue
-from pln import get_ttv, set_ttv
 from opencog.bindlink import execute_atom, evaluate_atom
 import numpy as np
 
 
+sys.path.append('../../../opencog/torchpln/')
+from pln import  TTruthValue
+from pln import get_ttv, set_ttv
+
 atomspace = AtomSpace()
 initialize_opencog(atomspace)
 rule_base = ConceptNode('PLN')
-ExecutionLink(SchemaNode("URE:maximum-iterations"), 
+ExecutionLink(SchemaNode("URE:maximum-iterations"),
               rule_base, NumberNode('10'))
 
 
@@ -57,7 +60,7 @@ def params(train_implication):
             else:
                 ttv = TTruthValue(Pcolorfruit[fruits.index(fruit)]
                                   [colors.index(color)], 0.5)
-            set_ttv(ImplicationLink(PredicateNode(fruit),         
+            set_ttv(ImplicationLink(PredicateNode(fruit),
                                     PredicateNode(color)), ttv)
     return param
 
@@ -80,7 +83,7 @@ def build_modus_ponens():
                     EvaluationLink(VariableNode("$P1"), VariableNode("$C1")))))
 
     DefineLink(DefinedSchemaNode("modus_ponens_predicates"), mp_rule)
-    MemberLink(DefinedSchemaNode("modus_ponens_predicates"), 
+    MemberLink(DefinedSchemaNode("modus_ponens_predicates"),
                ConceptNode("PLN"))
 
 
@@ -99,7 +102,7 @@ def main():
     print("inital implication links")
     for color in colors:
         for fruit in fruits:
-            print(ImplicationLink(PredicateNode(fruit),         
+            print(ImplicationLink(PredicateNode(fruit),
                                   PredicateNode(color)))
 
     for i in range(300):
@@ -108,7 +111,7 @@ def main():
         fruit = fruits[fruit_id]
         color = colors[color_id]
         x = fruit + "-" + str(i)
-        set_ttv(EvaluationLink(PredicateNode(fruit), 
+        set_ttv(EvaluationLink(PredicateNode(fruit),
                                ConceptNode(x)),
                 TTruthValue(1.0, 1.0))
         optimizer.zero_grad()
@@ -129,7 +132,7 @@ def main():
     print("implication links")
     for color in colors:
         for fruit in fruits:
-            print(ImplicationLink(PredicateNode(fruit),         
+            print(ImplicationLink(PredicateNode(fruit),
                                   PredicateNode(color)))
     print("after training")
     print(res_string.format(w[0], w[1], w[2], w[2], w[3]))
