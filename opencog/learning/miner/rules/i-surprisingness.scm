@@ -65,10 +65,10 @@
              (f (Quote
                   (Lambda
                     (Unquote f-vardecl)
-                    (And
+                    (Present
                       (map Unquote cnj-bodies)))))
              (f-minsup (minsup-eval f texts ms))
-             (f-isurp (isurp-eval f texts)))
+             (f-isurp (isurp-eval mode f texts)))
         (Bind
           (VariableList
             typed-f-vardecl
@@ -91,8 +91,8 @@
 (define (gen-i-surprisingness-formula mode)
   (lambda (conclusion . premises)
 
-    (cog-logger-debug "(i-surprisingness-formula mode = ~a, conclusion = ~a, premises = ~a"
-                      mode conclusion premises)
+    ;; (cog-logger-debug "(i-surprisingness-formula mode = ~a, conclusion = ~a, premises = ~a"
+    ;;                   mode conclusion premises)
 
     (if (= 1 (length premises))
         (let* ((pat-isurp conclusion)
@@ -109,42 +109,8 @@
                (isurp (isurp-op pat texts)))
           (cog-set-tv! pat-isurp (stv isurp 1))))))
 
-;; Old I-Surprisingness
-
+;; Instantiate isurp formula for the different modes
 (define isurp-old-formula (gen-i-surprisingness-formula 'isurp-old))
-(define (define-isurp-old-rule x)
-  (let ((rule-name (string-append "isurp-old-" (number->string x) "ary-rule")))
-    (DefineLink
-      (DefinedSchemaNode rule-name)
-      (gen-i-surprisingness-rule 'isurp-old x))))
-(map define-isurp-old-rule (cdr (iota-plus-one 8)))
-
-;; Old normalized I-Surprisingness
-
 (define nisurp-old-formula (gen-i-surprisingness-formula 'nisurp-old))
-(define (define-nisurp-old-rule x)
-  (let ((rule-name (string-append "nisurp-old-" (number->string x) "ary-rule")))
-    (DefineLink
-      (DefinedSchemaNode rule-name)
-      (gen-i-surprisingness-rule 'nisurp-old x))))
-(map define-nisurp-old-rule (cdr (iota-plus-one 8)))
-
-;; New I-Surprisingness
-
 (define isurp-formula (gen-i-surprisingness-formula 'isurp))
-(define (define-isurp-rule x)
-  (let ((rule-name (string-append "isurp-" (number->string x) "ary-rule")))
-    (DefineLink
-      (DefinedSchemaNode rule-name)
-      (gen-i-surprisingness-rule 'isurp x))))
-(map define-isurp-rule (cdr (iota-plus-one 8)))
-
-;; New normalized I-Surprisingness
-
 (define nisurp-formula (gen-i-surprisingness-formula 'nisurp))
-(define (define-nisurp-rule x)
-  (let ((rule-name (string-append "nisurp-" (number->string x) "ary-rule")))
-    (DefineLink
-      (DefinedSchemaNode rule-name)
-      (gen-i-surprisingness-rule 'nisurp x))))
-(map define-nisurp-rule (cdr (iota-plus-one 8)))
