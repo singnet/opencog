@@ -167,6 +167,16 @@ ELSE (ATOMSPACE_FOUND)
 	MESSAGE(FATAL_ERROR "AtomSpace missing: it is needed!")
 ENDIF (ATOMSPACE_FOUND)
 
+# URE
+FIND_PACKAGE(URE 1.0.0 CONFIG)
+IF (URE_FOUND)
+	MESSAGE(STATUS "URE found.")
+	ADD_DEFINITIONS(-DHAVE_URE)
+	SET(HAVE_URE 1)
+ELSE (URE_FOUND)
+	MESSAGE(STATUS "URE was not found. PLN will not be built.")
+ENDIF (URE_FOUND)
+
 # ----------------------------------------------------------
 # Check for boost. We need dynamic-linked, threaded libs by default.
 SET(Boost_USE_STATIC_LIBS OFF)
@@ -232,16 +242,6 @@ MESSAGE(STATUS "${STACK_FOUND_MESSAGE}")
 FIND_LIBRARY(GMP_LIBRARY gmp)
 FIND_PATH(GMP_INCLUDE_DIR gmp.h)
 
-# Gtk-3 required for visualization
-FIND_PACKAGE(GTK3)
-IF (GTK3_FOUND)
-	# MESSAGE(STATUS "GTK3 found.")
-	ADD_DEFINITIONS(-DHAVE_GTK)
-	SET(HAVE_GTK 1)
-ELSE (GTK3_FOUND)
-	MESSAGE(STATUS "GTK missing: needed for the the gtk-visualizer.")
-ENDIF (GTK3_FOUND)
-
 # Gnu Guile scheme interpreter
 # Version 2.2.2 is needed for mrs io ports, compilation, atomics, nlp
 FIND_PACKAGE(Guile 2.2.2)
@@ -253,17 +253,6 @@ ELSE (GUILE_FOUND AND GMP_LIBRARY AND GMP_INCLUDE_DIR)
 	SET(GUILE_DIR_MESSAGE "Guile was not found; the scheme shell will not be built.\nTo over-ride, make sure GUILE_LIBRARIES and GUILE_INCLUDE_DIRS are set.")
 	MESSAGE(STATUS "${GUILE_DIR_MESSAGE}")
 ENDIF (GUILE_FOUND AND GMP_LIBRARY AND GMP_INCLUDE_DIR)
-
-# ----------------------------------------------------------
-# Lapack is needed for BLOPEX
-FIND_PACKAGE(LAPACK)
-IF (LAPACK_FOUND)
-	# MESSAGE(STATUS "LAPACK found.")
-	ADD_DEFINITIONS(-DHAVE_LAPACK)
-	SET(HAVE_LAPACK 1)
-ELSE (LAPACK_FOUND)
-	MESSAGE(STATUS "LAPACK missing: needed for blopex-based clustering.")
-ENDIF (LAPACK_FOUND)
 
 # ----------------------------------------------------------
 # Link-Grammar is needed for several NLP subsystems
@@ -284,18 +273,6 @@ IF (UUID_FOUND)
 ELSE (UUID_FOUND)
 	MESSAGE(STATUS "UUID library missing: needed for NLP.")
 ENDIF (UUID_FOUND)
-
-# ----------------------------------------------------------
-# Octomap
-FIND_PACKAGE(Octomap)
-IF(OCTOMAP_FOUND AND OCTOMAP_LIBRARY)
-  ADD_DEFINITIONS(-DHAVE_OCTOMAP)
-  SET(HAVE_OCTOMAP 1)
-  INCLUDE_DIRECTORIES(${OCTOMAP_INCLUDE_DIR})
-  SET(OCTOMAP_DIR_MESSAGE "Octomap was found.")
-ELSE (OCTOMAP_FOUND AND OCTOMAP_LIBRARY)
-  SET(OCTOMAP_DIR_MESSAGE "Octomap missing: needed for the SpaceTime map.")
-ENDIF(OCTOMAP_FOUND AND OCTOMAP_LIBRARY)
 
 # ----------------------------------------------------------
 # Python and Cython
@@ -512,9 +489,15 @@ SET (MAN_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/man")
 
 IF(HAVE_ATOMSPACE AND HAVE_COGUTIL)
 	SET(HAVE_ATTENTION 1)
-	SET(HAVE_DIMEMBED 1)
-	SET(HAVE_STATISTICS 1)
 ENDIF(HAVE_ATOMSPACE AND HAVE_COGUTIL)
+
+IF(HAVE_URE)
+	SET(HAVE_PLN 1)
+ENDIF(HAVE_URE)
+
+IF(HAVE_ATOMSPACE AND HAVE_GUILE)
+	SET(HAVE_OPENPSI 1)
+ENDIF(HAVE_ATOMSPACE AND HAVE_GUILE)
 
 IF(HAVE_ATOMSPACE)
 	SET(HAVE_SERVER 1)
@@ -668,18 +651,16 @@ ADD_SUBDIRECTORY(doc EXCLUDE_FROM_ALL)
 # Show a summary of what we found, what we will do.
 
 SUMMARY_ADD("Attention" "Agents for attention allocation dynamics" HAVE_ATTENTION)
-SUMMARY_ADD("Blopex" "BLOPEX block eigenvalue solver" HAVE_LAPACK)
 SUMMARY_ADD("Cython bindings" "Cython (python) bindings" HAVE_CYTHON)
-SUMMARY_ADD("Dim. Embedding" "Compute dimensional embedding of the AtomSpace" HAVE_DIMEMBED)
 SUMMARY_ADD("Doxygen" "Code documentation" DOXYGEN_FOUND)
-SUMMARY_ADD("GTK Visualizer" "GTK3-based Atomspace Visualizer" HAVE_GTK)
 SUMMARY_ADD("Python tests" "Python bindings nose tests" HAVE_NOSETESTS)
 SUMMARY_ADD("REST Events" "REST Atomspace Event Publisher module"
 	HAVE_EVENT_PUBLISHING_DEPENDENCIES)
 SUMMARY_ADD("Server" "The CogServer" HAVE_SERVER)
-SUMMARY_ADD("SpaceTime" "3D Space-Time object tracker" HAVE_OCTOMAP)
 SUMMARY_ADD("Unit tests" "Unit tests" CXXTEST_FOUND)
 SUMMARY_ADD("NLP" "Natural Language Processing" HAVE_NLP)
 SUMMARY_ADD("Haskell codes" "Logic via Lojban" HAVE_STACK AND BUILD_LOJBAN)
+SUMMARY_ADD("PLN" "Probabilistic Logic Network" HAVE_PLN)
+SUMMARY_ADD("OpenPsi" "MicroPsi OpenCog implementation" HAVE_OPENPSI)
 
 SUMMARY_SHOW()

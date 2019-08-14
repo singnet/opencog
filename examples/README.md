@@ -21,8 +21,6 @@ sureal          - Demonstrates how to use the Surface Realization
 openpsi         - An example implementation of openpsi to control a simple
                   agent.
 
-learning        - Various learning algorithm examples. For now only the miner.
-
 Stale Examples:
 ---------------
 The following examples illustrate subsystems that are not currently

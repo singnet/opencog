@@ -32,9 +32,9 @@ This git repository contains assorted projects that are central to the
 OpenCog project, but are not yet mature or stable, and are subject to
 active development and experimentation. These include:
 * An assortment of natural language processing subsystems, including:
--- Natural language generation (for expressiong thoughts as sentences).
--- Natural language input (for reading and hearing).
--- Assorted chatbots, some of which are embodied.
+  * Natural language generation (for expressiong thoughts as sentences).
+  * Natural language input (for reading and hearing).
+  * Assorted chatbots, some of which are embodied.
 * PLN, a probabilistic reasoning and inference system.
 * Attention Allocation, for managing combinatoric explosion during
   reasoning and language generation.
@@ -49,8 +49,6 @@ active development and experimentation. These include:
   two unrelated ideas: a generic rule-class selection and plannning
   system, and a model of human psychological states. An open to-do item
   is to untangle these two.
-* An unsupervised learning system or "pattern miner", for extracting
-  "surprising" patterns.
 * A supervised learning system, MOSES, for extracting patterns from
   tabular data. This is located in a seprate repository,
   [MOSES](https://github.com/opencog/moses).
@@ -133,6 +131,13 @@ the build, will be more precise as to which parts will not be built.
 > 3D occupancy grid mapping library
 > Required for the robot perception subsystem.
 > `sudo apt-get install liboctomap-dev`
+
+###### URE
+> Unified Rule Engine
+> http://github.com/opencog/ure
+> Required for PLN
+> It uses exactly the same build proceedure as this package. Be sure
+  to `sudo make install` at the end.
 
 Obsolete Prerequisites
 ----------------------
