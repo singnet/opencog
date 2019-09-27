@@ -6,12 +6,7 @@ ADD_LIBRARY(attentionexperiment SHARED
 )
 
 TARGET_LINK_LIBRARIES(attentionexperiment
+	${ATTENTION_LIBRARIES}
+	${COGSERVER_LIBRARIES}
 	${ATOMSPACE_LIBRARIES}
-	attention
-	server
 )
-
-
-ADD_DEPENDENCIES(attentionexperiment attention)
-ADD_DEPENDENCIES(attentionexperiment server)
-ADD_DEPENDENCIES(attentionexperiment cogserver)
