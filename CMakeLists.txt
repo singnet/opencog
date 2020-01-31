@@ -184,7 +184,7 @@ IF (ATTENTIONBANK_FOUND)
 	ADD_DEFINITIONS(-DHAVE_BANK)
 	SET(HAVE_BANK 1)
 ELSE (ATTENTIONBANK_FOUND)
-	MESSAGE(STATUS "AttentionBank was not found.")
+	MESSAGE(STATUS "AttentionBank was not found. OpenPsi and Ghost will not be built.")
 ENDIF (ATTENTIONBANK_FOUND)
 
 # URE
@@ -194,39 +194,18 @@ IF (URE_FOUND)
 	ADD_DEFINITIONS(-DHAVE_URE)
 	SET(HAVE_URE 1)
 ELSE (URE_FOUND)
-	MESSAGE(STATUS "URE was not found. PLN will not be built.")
+	MESSAGE(STATUS "URE was not found. OpenPsi will not be built.")
 ENDIF (URE_FOUND)
 
-# ----------------------------------------------------------
-# Check for boost. We need dynamic-linked, threaded libs by default.
-SET(Boost_USE_STATIC_LIBS OFF)
-SET(Boost_USE_MULTITHREADED ON)
-SET(MIN_BOOST 1.46)
-
-# Required boost packages
-FIND_PACKAGE(Boost ${MIN_BOOST} COMPONENTS date_time filesystem program_options regex serialization system thread REQUIRED)
-
-IF(Boost_FOUND)
-	SET(Boost_FOUND_SAVE 1)
-ELSE(Boost_FOUND)
-	MESSAGE(FATAL_ERROR "Boost ${MIN_BOOST} or newer is needed to build OpenCog!")
-ENDIF(Boost_FOUND)
-
-# Opencog won't compile with Boost 1.51, some kind of conflict with
-# hash functions, see github bugs 1 and 36
-IF(105100 EQUAL ${Boost_VERSION})
-	MESSAGE(FATAL_ERROR "Boost version 1.51 will not work with OpenCog.  Please use a different version.")
-ENDIF(105100 EQUAL ${Boost_VERSION})
-MESSAGE(STATUS "Boost version ${Boost_VERSION} found.")
-
-# Optional boost packages; can build without these.
-FIND_PACKAGE(Boost ${MIN_BOOST} COMPONENTS python program_options QUIET)
-FIND_PACKAGE(Boost ${MIN_BOOST} COMPONENTS math_c99 QUIET)
-
-# Arghhh. Except cmake is treating above as required, not optional. #$%**&
-IF(Boost_FOUND_SAVE)
-	SET(Boost_FOUND 1)
-ENDIF(Boost_FOUND_SAVE)
+# PLN
+FIND_PACKAGE(PLN CONFIG)
+IF (PLN_FOUND)
+	MESSAGE(STATUS "PLN found.")
+	ADD_DEFINITIONS(-DHAVE_PLN)
+	SET(HAVE_PLN 1)
+ELSE (PLN_FOUND)
+	MESSAGE(STATUS "PLN was not found. Ghost will not be built.")
+ENDIF (PLN_FOUND)
 
 # ----------------------------------------------------------
 # Needed for unit tests
@@ -276,8 +255,8 @@ ENDIF (GUILE_FOUND AND GMP_LIBRARY AND GMP_INCLUDE_DIR)
 
 # ----------------------------------------------------------
 # Link-Grammar is needed for several NLP subsystems
-# Only 5.4.0 or newer has the required API in it.
-FIND_PACKAGE(LinkGrammar 5.4.0)
+# Only 5.6.2 or newer has the required API in it.
+FIND_PACKAGE(LinkGrammar 5.6.2)
 IF (LINK_GRAMMAR_FOUND)
 	SET(HAVE_LINK_GRAMMAR 1)
 	INCLUDE_DIRECTORIES(${LINK_GRAMMAR_INCLUDE_DIRS})
@@ -296,91 +275,8 @@ ENDIF (UUID_FOUND)
 
 # ----------------------------------------------------------
 # Python and Cython
-#
-# NOTE: Python interpreter is needed for runing python unit tests,
-# and for running the FindCython module.
-#
-# Search for Python3 first, and use that, if found. Else use Python2.
-# To use Python2 only from the build directory run the following
-# rm CMakeCache.txt && cmake -DCMAKE_DISABLE_FIND_PACKAGE_Python3Interp=TRUE ..
 
-FIND_PACKAGE(Python3Interp)
-IF (3.4.0 VERSION_LESS "${PYTHON3_VERSION_STRING}")
-	SET (HAVE_PY_INTERP 1)
-	SET (PYTHON_VER python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
-	MESSAGE(STATUS "Python ${PYTHON3_VERSION_STRING} interpreter found.")
-ENDIF()
-
-IF (NOT HAVE_PY_INTERP)
-	FIND_PACKAGE(PythonInterp)
-	IF (2.7.0 VERSION_LESS ${PYTHON_VERSION_STRING})
-		SET (HAVE_PY_INTERP 1)
-		SET (PYTHON_VER python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
-		MESSAGE(STATUS "Python ${PYTHON_VERSION_STRING} interpreter found.")
-	ENDIF()
-ENDIF()
-
-FIND_PACKAGE(PythonLibs)
-IF (PYTHONLIBS_FOUND AND
-     ((PYTHON3INTERP_FOUND AND 3.4.0 VERSION_LESS ${PYTHONLIBS_VERSION_STRING})
-     OR
-     (2.7.0 VERSION_LESS ${PYTHONLIBS_VERSION_STRING})))
-	SET (HAVE_PY_LIBS 1)
-	MESSAGE(STATUS "Python ${PYTHONLIBS_VERSION_STRING} libraries found.")
-ELSE()
-	MESSAGE(STATUS "Python libraries NOT found.")
-ENDIF()
-
-# Cython is used to generate python bindings.
-IF(HAVE_PY_INTERP)
-	FIND_PACKAGE(Cython 0.23.0)
-
-	IF (CYTHON_FOUND AND HAVE_PY_LIBS)
-		ADD_DEFINITIONS(-DHAVE_CYTHON)
-		SET(HAVE_CYTHON 1)
-
-		# Find python destination dir for python bindings
-		# because it may differ on each operating system.
-		EXECUTE_PROCESS(
-			COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/scripts/get_python_lib.py" "${CMAKE_INSTALL_PREFIX}"
-			OUTPUT_VARIABLE PYTHON_DEST
-		)
-
-		# Replace new line at end
-		STRING(REPLACE "\n" "" PYTHON_DEST "${PYTHON_DEST}")
-		IF ("${PYTHON_DEST}" STREQUAL "")
-			MESSAGE(FATAL_ERROR "Python destination dir not found")
-		ELSE ("${PYTHON_DEST}" STREQUAL "")
-			MESSAGE(STATUS "Python destination dir found: ${PYTHON_DEST}" )
-		ENDIF ("${PYTHON_DEST}" STREQUAL "")
-
-		# thunk
-		SET(PYTHON_ROOT "${PYTHON_DEST}")
-		SET(PYTHON_DEST "${PYTHON_DEST}/opencog")
-
-		MESSAGE(STATUS
-			"Python install dir: ${PYTHON_DEST}" )
-
-	ELSE (CYTHON_FOUND AND HAVE_PY_LIBS)
-		IF(NOT CYTHON_FOUND)
-			MESSAGE(STATUS "Cython executable not found.")
-		ENDIF(NOT CYTHON_FOUND)
-	ENDIF (CYTHON_FOUND AND HAVE_PY_LIBS)
-
-	# Nosetests will find and automatically run python tests.
-	IF (PYTHON3INTERP_FOUND)
-		FIND_PROGRAM(NOSETESTS_EXECUTABLE nosetests3)
-	ELSE ()
-		FIND_PROGRAM(NOSETESTS_EXECUTABLE nosetests-2.7)
-	ENDIF ()
-	IF (NOT NOSETESTS_EXECUTABLE)
-		MESSAGE(STATUS "nosetests not found: needed for python tests")
-	ENDIF ()
-	IF (NOSETESTS_EXECUTABLE AND CYTHON_FOUND AND HAVE_PY_LIBS)
-		SET(HAVE_NOSETESTS 1)
-		MESSAGE(STATUS "Using nosetests executable " ${NOSETESTS_EXECUTABLE})
-	ENDIF (NOSETESTS_EXECUTABLE AND CYTHON_FOUND AND HAVE_PY_LIBS)
-ENDIF(HAVE_PY_INTERP)
+include(OpenCogFindPython)
 
 # ----------------------------------------------------------
 # Optional, currently needed only to hush up DRD in util/Logger.cc
@@ -404,7 +300,7 @@ ENDIF (VALGRIND_FOUND)
 # Include configuration.
 
 # Set default include paths.
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR} ${Boost_INCLUDE_DIRS}
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}
 	${COGUTIL_INCLUDE_DIR} ${ATOMSPACE_INCLUDE_DIR})
 
 # Macros that define how atom types get declared.
@@ -466,21 +362,17 @@ SET (MAN_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/man")
 # ==========================================================
 # Decide what to build, based on the packages found.
 
-IF(HAVE_ATOMSPACE AND HAVE_COGUTIL)
-	SET(HAVE_ATTENTION 1)
-ENDIF(HAVE_ATOMSPACE AND HAVE_COGUTIL)
-
-IF(HAVE_URE)
-	SET(HAVE_PLN 1)
-ENDIF(HAVE_URE)
-
-IF(HAVE_ATOMSPACE AND HAVE_GUILE)
+IF(HAVE_ATOMSPACE AND HAVE_GUILE AND HAVE_BANK AND HAVE_URE)
 	SET(HAVE_OPENPSI 1)
-ENDIF(HAVE_ATOMSPACE AND HAVE_GUILE)
+ENDIF(HAVE_ATOMSPACE AND HAVE_GUILE AND HAVE_BANK AND HAVE_URE)
 
 IF(HAVE_ATOMSPACE AND HAVE_GUILE AND HAVE_LINK_GRAMMAR AND HAVE_UUID)
 	SET(HAVE_NLP 1)
 ENDIF(HAVE_ATOMSPACE AND HAVE_GUILE AND HAVE_LINK_GRAMMAR AND HAVE_UUID)
+
+IF(HAVE_BANK AND HAVE_OPENPSI AND HAVE_NLP AND HAVE_PLN)
+	SET(HAVE_GHOST 1)
+ENDIF(HAVE_BANK AND HAVE_OPENPSI AND HAVE_NLP AND HAVE_PLN)
 
 ADD_SUBDIRECTORY(lib)
 ADD_SUBDIRECTORY(opencog)
@@ -624,12 +516,12 @@ ADD_SUBDIRECTORY(doc EXCLUDE_FROM_ALL)
 SUMMARY_ADD("Cython bindings" "Cython (python) bindings" HAVE_CYTHON)
 SUMMARY_ADD("Doxygen" "Code documentation" DOXYGEN_FOUND)
 SUMMARY_ADD("Python tests" "Python bindings nose tests" HAVE_NOSETESTS)
+SUMMARY_ADD("Unit tests" "Unit tests" CXXTEST_FOUND)
+SUMMARY_ADD("NLP" "Natural Language Processing tools" HAVE_NLP)
+SUMMARY_ADD("OpenPsi" "MicroPsi OpenCog implementation" HAVE_OPENPSI)
+SUMMARY_ADD("Ghost" "Ghost chatbot" HAVE_GHOST)
+SUMMARY_ADD("Haskell codes" "Logic via Lojban" HAVE_STACK AND BUILD_LOJBAN)
 SUMMARY_ADD("REST Events" "REST Atomspace Event Publisher module"
 	HAVE_EVENT_PUBLISHING_DEPENDENCIES)
-SUMMARY_ADD("Unit tests" "Unit tests" CXXTEST_FOUND)
-SUMMARY_ADD("NLP" "Natural Language Processing" HAVE_NLP)
-SUMMARY_ADD("Haskell codes" "Logic via Lojban" HAVE_STACK AND BUILD_LOJBAN)
-SUMMARY_ADD("PLN" "Probabilistic Logic Network" HAVE_PLN)
-SUMMARY_ADD("OpenPsi" "MicroPsi OpenCog implementation" HAVE_OPENPSI)
 
 SUMMARY_SHOW()

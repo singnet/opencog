@@ -96,19 +96,6 @@ LGParseLink::LGParseLink(const HandleSeq& oset, Type t)
 	init();
 }
 
-LGParseLink::LGParseLink(const Link& l)
-	: FunctionLink(l)
-{
-	// Type must be as expected
-	Type tparse = l.get_type();
-	if (not nameserver().isA(tparse, LG_PARSE_LINK))
-	{
-		const std::string& tname = nameserver().getTypeName(tparse);
-		throw InvalidParamException(TRACE_INFO,
-			"Expecting an LgParseLink, got %s", tname.c_str());
-	}
-}
-
 LGParseMinimal::LGParseMinimal(const HandleSeq& oset, Type t)
 	: LGParseLink(oset, t)
 {
@@ -120,19 +107,6 @@ LGParseMinimal::LGParseMinimal(const HandleSeq& oset, Type t)
 			"Expecting an LgParseMinimal, got %s", tname.c_str());
 	}
 	init();
-}
-
-LGParseMinimal::LGParseMinimal(const Link& l)
-	: LGParseLink(l)
-{
-	// Type must be as expected
-	Type tparse = l.get_type();
-	if (not nameserver().isA(tparse, LG_PARSE_MINIMAL))
-	{
-		const std::string& tname = nameserver().getTypeName(tparse);
-		throw InvalidParamException(TRACE_INFO,
-			"Expecting an LgParseMinimal, got %s", tname.c_str());
-	}
 }
 
 // =================================================================
@@ -246,8 +220,8 @@ ValuePtr LGParseLink::execute(AtomSpace* as, bool silent)
 	char idstr[37];
 	uuid_unparse(uu, idstr);
 
-	char sentstr[sizeof(idstr) + 9] = "sentence@";
-	strncat(sentstr, idstr, sizeof(idstr));
+	char sentstr[sizeof(idstr) + 10] = "sentence@";
+	strcat(sentstr, idstr);
 
 	Handle snode(as->add_node(SENTENCE_NODE, sentstr));
 
