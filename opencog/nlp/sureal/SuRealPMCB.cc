@@ -44,8 +44,8 @@ using namespace std;
  * @param vars           the set of nodes that should be treated as variables
  */
 SuRealPMCB::SuRealPMCB(AtomSpace* pAS, const HandleSet& vars, bool use_cache) :
-    InitiateSearchCB(pAS),
-    DefaultPatternMatchCB(pAS),
+    InitiateSearchMixin(pAS),
+    TermMatchMixin(pAS),
     m_as(pAS),
     m_vars(vars)
 {
@@ -528,7 +528,7 @@ bool SuRealPMCB::grounding(const HandleMap &var_soln, const HandleMap &pred_soln
                         Handle hNewPred = m_as->get_handle(PREDICATE_NODE, sWord);
 
                         if (hNewPred == Handle::UNDEFINED)
-                            hNewPred = m_as->add_node(PREDICATE_NODE, sWord);
+                            hNewPred = m_as->add_node(PREDICATE_NODE, std::move(sWord));
 
                         // update the mapping by replacing the lemma
                         // by the one that passed the disjunct match
@@ -899,9 +899,9 @@ bool SuRealPMCB::disjunct_match(const Handle& hPatWordNode, const Handle& hSolnW
 }
 
 /**
- * Implement the initiate_search method.
+ * Implement the perform_search method.
  *
- * Similar to InitiateSearchCB::initiate_search, in which we start search
+ * Similar to InitiateSearchMixin::perform_search, in which we start search
  * by looking at the thinnest clause with constants.  However, since most clauses
  * for SuReal will have 0 constants, most searches will require looking at all
  * the links.  This implementation improves that by looking at links within a
@@ -910,7 +910,7 @@ bool SuRealPMCB::disjunct_match(const Handle& hPatWordNode, const Handle& hSolnW
  *
  * @param pPME       pointer to the PatternMatchEngine
  */
-bool SuRealPMCB::initiate_search(PatternMatchCallback& pmc)
+bool SuRealPMCB::perform_search(PatternMatchCallback& pmc)
 {
     // set targets, m_targets should always be a subset of m_interp
     if (m_interp.size() > 0)
@@ -1014,7 +1014,7 @@ bool SuRealPMCB::initiate_search(PatternMatchCallback& pmc)
 Handle SuRealPMCB::find_starter_recursive(const Handle& h, size_t& depth,
                                           Handle& start, size_t& width)
 {
-    Handle rh = InitiateSearchCB::find_starter_recursive(h, depth, start, width);
+    Handle rh = InitiateSearchMixin::find_starter_recursive(h, depth, start, width);
 
     // if the non-VariableNode is actually a variable
     if (m_vars.count(rh) == 1)

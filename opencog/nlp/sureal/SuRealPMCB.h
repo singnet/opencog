@@ -24,12 +24,12 @@
 #ifndef _OPENCOG_SUREAL_PMCB_H
 #define _OPENCOG_SUREAL_PMCB_H
 
-
 #include <unordered_map>
-#include <opencog/query/DefaultPatternMatchCB.h>
-#include <opencog/query/InitiateSearchCB.h>
-#include <opencog/atoms/base/Handle.h>
 
+#include <opencog/atoms/base/Handle.h>
+#include <opencog/query/InitiateSearchMixin.h>
+#include <opencog/query/TermMatchMixin.h>
+#include <opencog/query/SatisfyMixin.h>
 
 namespace opencog
 {
@@ -43,8 +43,9 @@ namespace nlp
  * and LG dictionary checks.
  */
 class SuRealPMCB :
-    public InitiateSearchCB,
-    public DefaultPatternMatchCB
+    public InitiateSearchMixin,
+    public TermMatchMixin,
+    public SatisfyMixin
 {
 public:
     SuRealPMCB(AtomSpace* as, const HandleSet& vars, bool use_cache);
@@ -54,12 +55,12 @@ public:
     virtual bool clause_match(const Handle& pattrn_link_h, const Handle& grnd_link_h);
     virtual bool grounding(const HandleMap &var_soln,
                            const HandleMap &pred_soln);
-    virtual bool initiate_search(PatternMatchCallback&);
+    virtual bool perform_search(PatternMatchCallback&);
     virtual void set_pattern(const Variables& vars,
                              const Pattern& pat)
     {
-        InitiateSearchCB::set_pattern(vars, pat);
-        DefaultPatternMatchCB::set_pattern(vars, pat);
+        InitiateSearchMixin::set_pattern(vars, pat);
+        TermMatchMixin::set_pattern(vars, pat);
     }
 
     std::map<Handle, HandleMapSeq> m_results;   // store the PM results

@@ -39,7 +39,7 @@ Handle OpenPsiRules::add_rule(const HandleSeq& context, const Handle& action,
   // implicant of the psi-rule.
   HandleSeq temp_c =  context;
   temp_c.push_back(action);
-  Handle hca = _as->add_link(AND_LINK, temp_c);
+  Handle hca = _as->add_link(AND_LINK, std::move(temp_c));
 
   // Add the psi-rule, set the truthvalue and default record of whether
   // the action of the rule was executed.
@@ -71,7 +71,7 @@ Handle OpenPsiRules::add_rule(const HandleSeq& context, const Handle& action,
 
     // Add to the index of rules.
     PatternLinkPtr query_body = \
-      createPatternLink(Handle(createLink(context, AND_LINK)));
+      createPatternLink(std::move(Handle(createLink(std::move(context), AND_LINK))));
     _psi_rules[rule] = std::make_tuple(context, action, goal, query_body);
   }
 
