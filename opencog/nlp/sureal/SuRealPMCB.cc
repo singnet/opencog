@@ -22,6 +22,7 @@
  */
 
 #include <opencog/atoms/core/FindUtils.h>
+#include <opencog/atoms/pattern/PatternTerm.h>
 #include <opencog/query/PatternMatchEngine.h>
 #include <opencog/neighbors/GetPredicates.h>
 #include <opencog/neighbors/Neighbors.h>
@@ -927,11 +928,12 @@ bool SuRealPMCB::perform_search(PatternMatchCallback& pmc)
 
     // Not sure quite what triggers this, but there are patterns
     // with no mandatory clauses.
-    if (0 ==  _pattern->mandatory.size()) return false;
+    if (0 ==  _pattern->pmandatory.size()) return false;
 
     // Reaching here means no constants, so do some search space
     // reduction here
-    Handle bestClause = _pattern->mandatory[0];
+    PatternTermPtr root_clause = _pattern->pmandatory[0];
+    Handle bestClause = root_clause->getHandle();
 
     logger().debug("[SuReal] Start pred is: %s",
                    bestClause->to_short_string().c_str());
@@ -992,7 +994,7 @@ bool SuRealPMCB::perform_search(PatternMatchCallback& pmc)
     {
         logger().debug("[SuReal] Loop candidate: %s", c.handle->to_short_string().c_str());
 
-        if (pme.explore_neighborhood(bestClause, bestClause, c.handle))
+        if (pme.explore_neighborhood(bestClause, c.handle, root_clause))
             return true;
     }
     return false;
@@ -1011,10 +1013,10 @@ bool SuRealPMCB::perform_search(PatternMatchCallback& pmc)
  * @return        same as InitiateSearchCB::find_starter_recursive but change
  *                the result if is a variable
  */
-Handle SuRealPMCB::find_starter_recursive(const Handle& h, size_t& depth,
+Handle SuRealPMCB::find_starter_recursive(const PatternTermPtr& ptm, size_t& depth,
                                           Handle& start, size_t& width)
 {
-    Handle rh = InitiateSearchMixin::find_starter_recursive(h, depth, start, width);
+    Handle rh = InitiateSearchMixin::find_starter_recursive(ptm, depth, start, width);
 
     // if the non-VariableNode is actually a variable
     if (m_vars.count(rh) == 1)
