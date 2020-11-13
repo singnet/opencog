@@ -3,11 +3,11 @@ version: 2.0
 jobs:
   opencog:
     docker:
-      - image: opencog/opencog-deps
+      - image: singularitynet/opencog-deps
         user: root
         environment:
           CCACHE_DIR: /ws/ccache
-      - image: opencog/relex
+      - image: singularitynet/relex
         name: relex
         command: /bin/sh -c "./opencog-server.sh"
     working_directory: /ws/opencog
@@ -119,7 +119,7 @@ jobs:
 
   package: #Place holder
     docker:
-      - image: opencog/opencog-deps
+      - image: singularitynet/opencog-deps
         user: root
     working_directory: /ws/opencog
     steps:
