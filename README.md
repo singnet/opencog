@@ -3,23 +3,38 @@ OpenCog
 
 [![CircleCI](https://circleci.com/gh/singnet/opencog/tree/master.svg?style=svg)](https://circleci.com/gh/singnet/opencog/tree/master)
 
-OpenCog is a framework for developing AI systems, especially appropriate
-for integrative multi-algorithm systems, and artificial general intelligence
-systems.  Though much work remains to be done, it currently contains a
-functional core framework, and a number of cognitive agents at varying levels
-of completion, some already displaying interesting and useful functionalities
-alone and in combination.
+This git repository contains the "OpenCog Framework", which has served
+as a (scientific, technical) laboratory for researching, exploring and
+learning how to integrate AI algorithms and systems into humanoid
+robotic systems.  Most of the activity within this particular repo has
+focused on integrating natural language chat, common-sense reasoning,
+assorted learning algorithms, and motor control of humanoid robots.
 
-The main project site is at https://opencog.org
+A stated goal of the [OpenCog project](https://opencog.org) is to develop
+artificial general intelligence (AGI) systems.  This is all and well;
+however, what can be found here, in this particular repo, is very far
+from that. The code here really is ... a laboratory for integrating
+various types of AI systems.  As such, it is a compilation of several
+decades of work by a large and varying collection of students,
+researchers, professors and software engineers.  As a laboratory, it is
+filled with all sorts of devices in varying states of working order,
+from well-polished to mostly-broken.
+
+See also:
+* ROCCA - [Rational OpenCog Controlled Agent](https://github.com/opencog/rocca).
+  This is a different assemblage of assorted OpenCog components,
+  so that they operate within Minecraft, in the OpenAI Gym. The focus
+  is on learning with the pattern miner, and reasoning with PLN.
+
 
 Overview
 --------
-OpenCog consists of multiple components. These can be found in assorted
-git repos under https://github.com/opencog
+Most of the basic components used in OpenCog are distributed across
+various git repos, (mostly) grouped under https://github.com/opencog
 
-This git repository contains an assortment of natural language tools,
-embodied chatbots, and control/action-selection mechanisms.
-These include:
+This git repository contains a crude natural language processing
+pipeline, several embodied chatbots, and some control/action-selection
+mechanisms.  These include:
 
 * Ghost, a Chatscript-compatible chatbot with additional capabilities
   for accepting visual sensory input, and for controlling robot
@@ -35,27 +50,24 @@ These include:
   * Natural language input (for reading and hearing).
   * Relex2logic, converting natural language to logic expressions.
   * Assorted chatbots, some of which are embodied.
-  * A lojban tool.
+  * A Lojban tool.
 
 Prerequisites
 -------------
-To build and run OpenCog, the packages listed below are required.
-With a few exceptions, most Linux distributions will provide these
-packages. Users of Ubuntu may use the dependency installer from the
-`/opencog/octool` repository.  Users of any version of Linux may
-use the 
-[Dockerfile](https://github.com/opencog/docker/blob/master/opencog/README.md) 
-to quickly build a container in which OpenCog will
-be built and run.
+To build and run the system here, the packages listed below are required.
+Users of Ubuntu may use the dependency installer from the
+[`/opencog/octool`](https://github.com/opencog/octool) repository.
+Docker containers with OpenCog preconfigured can be found in the
+[`opencog/docker`](https://github.com/opencog/docker) repo.
 
 ###### cogutil
-> Common OpenCog C++ utilities
+> Common OpenCog C++ utilities.
 > https://github.com/opencog/cogutil
 > It uses exactly the same build procedure as this package. Be sure
   to `sudo make install` at the end.
 
 ###### atomspace
-> OpenCog Atomspace database and reasoning engine
+> OpenCog Atomspace, a sophisticated (hyper-)graph database.
 > https://github.com/opencog/atomspace
 > It uses exactly the same build procedure as this package. Be sure
   to `sudo make install` at the end.
@@ -73,14 +85,14 @@ be built and run.
   to `sudo make install` at the end.
 
 ###### URE
-> OpenCog Unified Rule Engine
+> OpenCog Unified Rule Engine.
 > https://github.com/opencog/ure
 > Required for PLN
 > It uses exactly the same build procedure as this package. Be sure
   to `sudo make install` at the end.
 
 ###### pln
-> OpenCog Probabilistic Logic Networks
+> OpenCog Probabilistic Logic Networks reasoning system.
 > https://github.com/opencog/pln
 > It uses exactly the same build procedure as this package. Be sure
   to `sudo make install` at the end.
@@ -92,15 +104,17 @@ be built and run.
   to `sudo make install` at the end.
 
 ###### ros-behavior-scripting
-> Visual and auditory senses, robot motor control
+> Visual and auditory senses, robot motor control.
 > https://github.com/opencog/ros-behavior-scripting
 > It uses exactly the same build procedure as this package. Be sure
   to `sudo make install` at the end.
 
-###### Link Grammar
+###### lg-atomese
 > Natural Language Parser for English, Russian, other languages.
 > Required for natural language generation, and the chatbot.
-> https://www.abisource.com/projects/link-grammar/
+> https://github.com/opencog/lg-atomese
+> It uses exactly the same build procedure as this package. Be sure
+  to `sudo make install` at the end.
 
 
 Building OpenCog
