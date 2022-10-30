@@ -22,9 +22,12 @@ INSTALL (TARGETS LojbanModule
 
 ADD_EXECUTABLE(parse-lojban Parse)
 
+ADD_DEPENDENCIES(parse-lojban LojbanLib)
+
 TARGET_LINK_LIBRARIES(parse-lojban
     opencog-lojban-wrapper-0.1.0.0
     nlp-types
+    ${ATOMSPACE_LIBRARIES}
 )
 
 INSTALL (TARGETS parse-lojban RUNTIME DESTINATION "bin")
